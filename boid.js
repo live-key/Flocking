@@ -51,7 +51,6 @@ class Boid {
         let pointX = this.pos.x;
         let pointY = this.pos.y;
         point(this.pos.x, this.pos.y);
-        // triangle()
     }
 
     align(boids) {
