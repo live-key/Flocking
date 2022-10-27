@@ -13,11 +13,11 @@ class Boid {
         this.maxAcc   = 0.2;
         this.maxVel = 5;
         
-        this.alignRad   = 100;
-        this.cohesRad   = 25;
+        this.alignRad   = 25;
+        this.cohesRad   = 50;
         this.separRad   = 25;
-        this.avoidRad   = 25;
-        this.surviRad   = 25;
+        this.avoidRad   = 100;
+        // this.surviRad   = 25;
 
         this.maxRad = max(this.alignRad, this.cohesRad, this.separRad, 
                             this.avoidRad, this.surviRad);
@@ -75,34 +75,71 @@ class Boid {
     }
 
     cohesion(boids) {
+        let delta = createVector();
+        let total = 0;
+        for (let other of boids) {
+            let d = dist(this.pos.x, this.pos.y, 
+                other.pos.x, other.pos.y);
+            if (other != this && d < this.cohesRad) {
+                delta.add(other.pos)
+                total++;
+            }
+        }
 
+        if (total > 0) {
+            delta.div(total);
+            delta.sub(this.pos);
+            delta.setMag(this.maxVel);
+            delta.sub(this.vel);
+            delta.limit(this.maxAcc);
+        }
+        return delta;
     }
 
-    seperation(boids) {
+    separation(boids) {
+        let delta = createVector();
+        let total = 0;
+        for (let other of boids) {
+            let d = dist(this.pos.x, this.pos.y, 
+                other.pos.x, other.pos.y);
+            if (other != this && d < this.alignRad) {
+                let sep = p5.Vector.sub(this.pos, other.pos);
+                sep.div(d*d);
+                delta.add(sep);
+                total++;
+            }
+        }
 
+        if (total > 0) {
+            delta.div(total);
+            delta.setMag(this.maxVel);
+            delta.sub(this.vel);
+            delta.limit(this.maxAcc);
+        }
+        return delta;
     }
 
-    avoidance(boids) {
-
+    avoidance(obs) {
+        
     }
 
-    survival(boids) {
+    survival(pred) {
 
     }
 
     behaviour(boids) {
         let align = this.align(boids);
-        // let cohes = this.cohesion(boids);
-        // let separ = this.separation(boids);
+        let cohes = this.cohesion(boids);
+        let separ = this.separation(boids);
         // let avoid = this.avoidance(boids);
         // let survi = this.survival(boids);
 
         align.mult(alignSlider.value());
-        // cohes.mult(cohesSlider.value());
-        // separ.mult(separSlider.value());
+        cohes.mult(cohesSlider.value());
+        separ.mult(separSlider.value());
 
         this.acc.add(align);
-        // this.acceleration.add(cohesion);
-        // this.acceleration.add(separation);
+        this.acc.add(cohes);
+        this.acc.add(separ);
     }
 }
