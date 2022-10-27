@@ -16,11 +16,13 @@ class Boid {
         this.alignRad   = 25;
         this.cohesRad   = 50;
         this.separRad   = 25;
-        this.avoidRad   = 100;
+        this.avoidRad   = 60;
         // this.surviRad   = 25;
 
         this.maxRad = max(this.alignRad, this.cohesRad, this.separRad, 
                             this.avoidRad, this.surviRad);
+
+        this.dead = false;
     }
 
     edges() {
@@ -44,6 +46,7 @@ class Boid {
     }
     
     show() {
+        if (this.dead) return;
         strokeWeight(6);
         stroke(255);
         let pointX = this.pos.x;
@@ -120,26 +123,47 @@ class Boid {
     }
 
     avoidance(obs) {
-        
+        let delta = createVector();
+        let total = 0;
+
+        for (let ob of obs) {
+            let d = dist(this.pos.x, this.pos.y, 
+                ob.pos.x, ob.pos.y);
+            if (d  - ob.rad < this.avoidRad) {
+                if (d - ob.rad < -20) {
+                    this.dead = true;
+                    return delta;
+                }
+                let sep = p5.Vector.sub(this.pos, ob.pos);
+                sep.div(d*d);
+                delta.add(sep);
+                total++;
+            }
+        }
+
+        if (total > 0) {
+            delta.div(total);
+            delta.setMag(this.maxVel);
+            delta.sub(this.vel);
+            delta.limit(this.maxAcc);
+        }
+        return delta;
     }
 
-    survival(pred) {
-
-    }
-
-    behaviour(boids) {
+    behaviour(boids, obs) {
         let align = this.align(boids);
         let cohes = this.cohesion(boids);
         let separ = this.separation(boids);
-        // let avoid = this.avoidance(boids);
-        // let survi = this.survival(boids);
+        let avoid = this.avoidance(obs);
 
         align.mult(alignSlider.value());
         cohes.mult(cohesSlider.value());
         separ.mult(separSlider.value());
+        avoid.mult(avoidSlider.value());
 
         this.acc.add(align);
         this.acc.add(cohes);
         this.acc.add(separ);
+        this.acc.add(avoid);
     }
 }

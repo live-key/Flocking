@@ -1,9 +1,10 @@
 class Obstacle {
-    constructor() {
-        this.pos = createVector(random(width*0.25, width*0.75), 
-                random(height*0.25, height*0.75));
+    constructor(x, y) {
+        console.log(x, y)
+
+        this.pos = createVector(x, y);
         this.col = color(random(0,255), random(0,255), random(0,255));
-        this.rad = random(50, 70); 
+        this.rad = 60; 
     }
 
     show() {
