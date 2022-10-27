@@ -17,7 +17,6 @@ class Boid {
         this.cohesRad   = 50;
         this.separRad   = 25;
         this.avoidRad   = 60;
-        // this.surviRad   = 25;
 
         this.maxRad = max(this.alignRad, this.cohesRad, this.separRad, 
                             this.avoidRad, this.surviRad);

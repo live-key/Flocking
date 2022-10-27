@@ -1,4 +1,4 @@
-const flock = [];
+let flock = [];
 let obs = [];
 
 let aSlider, cSlider, sSlider;
@@ -36,5 +36,9 @@ function mousePressed() {
     obs.push(o);
   } else {
     obs = [];
+    flock = [];
+    for (let i = 0; i < 200; i++) {
+      flock.push(new Boid());
+    }
   }
 }
